@@ -10,23 +10,23 @@ def run(argv: Sequence | None = None) -> int:
 
     add_parser = subparsers.add_parser('add', help='Add a new task')
     add_parser.add_argument('task')
-    add_parser.set_defaults(command='handle_add')
+    add_parser.set_defaults(func=handle_add)
 
     update_parser = subparsers.add_parser('update', help='Update a task')
     update_parser.add_argument('task_id', type=int)
-    update_parser.set_defaults(command='handle_update')
+    update_parser.set_defaults(func=handle_update)
 
     delete_parser = subparsers.add_parser('delete', help='Delete a task')
     delete_parser.add_argument('task_id', type=int)
-    delete_parser.set_defaults(command='handle_delete')
+    delete_parser.set_defaults(func=handle_delete)
 
     in_progress_parser = subparsers.add_parser('mark-in-progress', help='Mark a task as in progress')
     in_progress_parser.add_argument('task_id', type=int)
-    in_progress_parser.set_defaults(command='handle_in_progress')
+    in_progress_parser.set_defaults(func=handle_in_progress)
 
     done_parser = subparsers.add_parser('mark-done', help='Mark a task as done')
     done_parser.add_argument('task_id')
-    done_parser.set_defaults(command='handle_done')
+    done_parser.set_defaults(func=handle_done)
 
     list_parser = subparsers.add_parser('list', help='List all tasks by their statuses')
     list_parser.add_argument(
@@ -34,7 +34,7 @@ def run(argv: Sequence | None = None) -> int:
         nargs="?",
         choices=["todo", "in-progress", "done"],
     )
-    list_parser.set_defaults(command='handle_list')
+    list_parser.set_defaults(func=handle_list)
 
     args = parser.parse_args(argv)
 
@@ -43,8 +43,10 @@ def run(argv: Sequence | None = None) -> int:
 
 def handle_add(args: argparse.Namespace) -> int:
     task = add_task(args.task)
-    print(f"Task added: {task.id}")
-    return 0
+    if task:
+        print(f"Task added successfully (ID: {task.id})")
+        return 0
+    return 1
 
 
 def handle_update(args: argparse.Namespace) -> int:
