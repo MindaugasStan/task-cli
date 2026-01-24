@@ -1,6 +1,7 @@
 import argparse
 from typing import Sequence
 
+from task_cli.models import Task
 from task_cli.services import add_task, update_task, delete_task, mark_task_in_progress, mark_task_done, list_tasks
 
 
@@ -14,6 +15,7 @@ def run(argv: Sequence | None = None) -> int:
 
     update_parser = subparsers.add_parser('update', help='Update a task')
     update_parser.add_argument('task_id', type=int)
+    update_parser.add_argument('description')
     update_parser.set_defaults(func=handle_update)
 
     delete_parser = subparsers.add_parser('delete', help='Delete a task')
@@ -25,7 +27,7 @@ def run(argv: Sequence | None = None) -> int:
     in_progress_parser.set_defaults(func=handle_in_progress)
 
     done_parser = subparsers.add_parser('mark-done', help='Mark a task as done')
-    done_parser.add_argument('task_id')
+    done_parser.add_argument('task_id', type=int)
     done_parser.set_defaults(func=handle_done)
 
     list_parser = subparsers.add_parser('list', help='List all tasks by their statuses')
@@ -50,22 +52,44 @@ def handle_add(args: argparse.Namespace) -> int:
 
 
 def handle_update(args: argparse.Namespace) -> int:
-    task = update_task(args.task_id)
-    return 0
+    try:
+        task = update_task(args.task_id, args.description)
+        print(f"Task updated: {task}")
+        return 0
+    except KeyError as error:
+        print(error)
+        return 1
 
 
 def handle_delete(args: argparse.Namespace) -> int:
     delete_task(args.task_id)
     return 0
 
+
 def handle_in_progress(args: argparse.Namespace) -> int:
-    mark_task_in_progress(args.task_id)
-    return 0
+    try:
+        mark_task_in_progress(args.task_id)
+        return 0
+    except KeyError as error:
+        print(error)
+        return 1
+
 
 def handle_done(args: argparse.Namespace) -> int:
-    mark_task_done(args.task_id)
-    return 0
+    try:
+        mark_task_done(args.task_id)
+        return 0
+    except KeyError as error:
+        print(error)
+        return 1
+
 
 def handle_list(args: argparse.Namespace) -> int:
-    list_tasks(args.status)
+    tasks = list_tasks(args.status)
+    if not tasks:
+        print("No tasks found")
+        return 0
+    for task_dict in tasks:
+        task = Task.from_dict(task_dict)
+        print(task)
     return 0
