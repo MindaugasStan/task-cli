@@ -39,8 +39,10 @@ def mark_task_done(task_id: int) -> dict:
     return _update_task(task_id, status=TaskStatus.DONE)
 
 
-def list_tasks(status: TaskStatus) -> list[dict]:
+def list_tasks(status: TaskStatus | None) -> list[dict]:
     tasks = load_tasks()
+    if not status:
+        return list(tasks)
     normalized_status = status.replace("-", "_")
     return list(filter(lambda task_dict: task_dict["status"] == normalized_status, tasks))
 
