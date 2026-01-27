@@ -62,7 +62,11 @@ def handle_update(args: argparse.Namespace) -> int:
 
 
 def handle_delete(args: argparse.Namespace) -> int:
-    delete_task(args.task_id)
+    try:
+        delete_task(args.task_id)
+    except KeyError as error:
+        print(error)
+        return 1
     return 0
 
 
