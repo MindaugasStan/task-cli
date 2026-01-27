@@ -1,12 +1,10 @@
-from pathlib import Path
 import json
-import os
-from dotenv import load_dotenv
+from pathlib import Path
 
 from task_cli.models import Task, TaskStatus
 
-load_dotenv()
-TASK_FILE = Path(os.getenv("TASK_FILE", "tasks.json"))
+
+TASK_FILE = Path("tasks.json")
 
 
 def _update_task(task_id: int, description: str = None, status: TaskStatus = None) -> dict:
