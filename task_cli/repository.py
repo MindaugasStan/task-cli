@@ -9,12 +9,10 @@ TASK_FILE = Path("tasks.json")
 
 def _update_task(task_id: int, description: str = None, status: TaskStatus = None) -> dict:
     tasks = load_tasks()
-
     for i, task_dict in enumerate(tasks):
         if task_dict["id"] == task_id:
             task = Task.from_dict(task_dict)
             task.update(description=description, status=status)
-
             tasks[i] = task.to_dict()
             save_tasks(tasks)
 

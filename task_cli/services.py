@@ -39,7 +39,7 @@ def mark_task_done(task_id: int) -> dict:
     return _update_task(task_id, status=TaskStatus.DONE)
 
 
-def list_tasks(status: TaskStatus | None) -> list[dict]:
+def list_tasks(status: TaskStatus | None = None) -> list[dict]:
     tasks = load_tasks()
     if not status:
         return list(tasks)
