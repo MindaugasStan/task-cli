@@ -1,6 +1,6 @@
 # task-cli
 
-https://roadmap.sh/projects/task-tracker
+Sample solution for the [task-tracker](https://roadmap.sh/projects/task-tracker) challenge from [roadmap.sh](https://roadmap.sh/).
 
 A simple command-line task manager that lets you add, update, delete, and track the status of your tasks. Tasks are stored locally in a `tasks.json` file.
 
