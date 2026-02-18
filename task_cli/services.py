@@ -4,12 +4,18 @@ from task_cli.models import TaskStatus, Task
 from task_cli.repository import load_tasks, save_task_to_file, save_tasks, _update_task
 
 
-def add_task(task: str) -> Task:
+def add_task(task_description: str) -> Task:
     tasks = load_tasks()
     task_id = 1
     if tasks:
         task_id = len(tasks) + 1
-    task = Task(id=task_id, description=task, status=TaskStatus.TODO, created_at=datetime.now(), updated_at=datetime.now())
+    task: Task = Task(
+        id=task_id,
+        description=task_description,
+        status=TaskStatus.TODO,
+        created_at=datetime.now(),
+        updated_at=datetime.now(),
+    )
     save_task_to_file(task)
     return task
 
@@ -44,4 +50,3 @@ def list_tasks(status: TaskStatus | None = None) -> list[dict]:
     if not status:
         return list(tasks)
     return list(filter(lambda task_dict: task_dict["status"] == status, tasks))
-

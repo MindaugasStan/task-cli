@@ -2,35 +2,44 @@ import argparse
 from typing import Sequence
 
 from task_cli.models import Task, TaskStatus
-from task_cli.services import add_task, update_task, delete_task, mark_task_in_progress, mark_task_done, list_tasks
+from task_cli.services import (
+    add_task,
+    update_task,
+    delete_task,
+    mark_task_in_progress,
+    mark_task_done,
+    list_tasks,
+)
 
 
 def run(argv: Sequence | None = None) -> int:
-    parser = argparse.ArgumentParser(prog='task_cli')
-    subparsers = parser.add_subparsers(dest='command', required=True)
+    parser = argparse.ArgumentParser(prog="task_cli")
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    add_parser = subparsers.add_parser('add', help='Add a new task')
-    add_parser.add_argument('task')
+    add_parser = subparsers.add_parser("add", help="Add a new task")
+    add_parser.add_argument("task")
     add_parser.set_defaults(func=handle_add)
 
-    update_parser = subparsers.add_parser('update', help='Update a task')
-    update_parser.add_argument('task_id', type=int)
-    update_parser.add_argument('description')
+    update_parser = subparsers.add_parser("update", help="Update a task")
+    update_parser.add_argument("task_id", type=int)
+    update_parser.add_argument("description")
     update_parser.set_defaults(func=handle_update)
 
-    delete_parser = subparsers.add_parser('delete', help='Delete a task')
-    delete_parser.add_argument('task_id', type=int)
+    delete_parser = subparsers.add_parser("delete", help="Delete a task")
+    delete_parser.add_argument("task_id", type=int)
     delete_parser.set_defaults(func=handle_delete)
 
-    in_progress_parser = subparsers.add_parser('mark-in-progress', help='Mark a task as in progress')
-    in_progress_parser.add_argument('task_id', type=int)
+    in_progress_parser = subparsers.add_parser(
+        "mark-in-progress", help="Mark a task as in progress"
+    )
+    in_progress_parser.add_argument("task_id", type=int)
     in_progress_parser.set_defaults(func=handle_in_progress)
 
-    done_parser = subparsers.add_parser('mark-done', help='Mark a task as done')
-    done_parser.add_argument('task_id', type=int)
+    done_parser = subparsers.add_parser("mark-done", help="Mark a task as done")
+    done_parser.add_argument("task_id", type=int)
     done_parser.set_defaults(func=handle_done)
 
-    list_parser = subparsers.add_parser('list', help='List all tasks by their statuses')
+    list_parser = subparsers.add_parser("list", help="List all tasks by their statuses")
     list_parser.add_argument(
         "status",
         nargs="?",
@@ -75,6 +84,7 @@ def _handle_mark(mark_func, task_id: int) -> int:
     except KeyError as error:
         print(error)
         return 1
+
 
 def handle_in_progress(args: argparse.Namespace) -> int:
     return _handle_mark(mark_task_in_progress, args.task_id)

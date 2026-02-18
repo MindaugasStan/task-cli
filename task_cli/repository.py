@@ -7,7 +7,9 @@ from task_cli.models import Task, TaskStatus
 TASK_FILE = Path("tasks.json")
 
 
-def _update_task(task_id: int, description: str = None, status: TaskStatus = None) -> dict:
+def _update_task(
+    task_id: int, description: str | None = None, status: TaskStatus | None = None
+) -> dict:
     tasks = load_tasks()
     for i, task_dict in enumerate(tasks):
         if task_dict["id"] == task_id:

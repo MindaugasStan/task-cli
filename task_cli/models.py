@@ -19,8 +19,8 @@ class Task:
 
     def to_dict(self):
         task_dictionary = asdict(self)
-        task_dictionary['created_at'] = self.created_at.isoformat()
-        task_dictionary['updated_at'] = self.updated_at.isoformat()
+        task_dictionary["created_at"] = self.created_at.isoformat()
+        task_dictionary["updated_at"] = self.updated_at.isoformat()
         return task_dictionary
 
     @classmethod
@@ -33,7 +33,9 @@ class Task:
             updated_at=datetime.fromisoformat(data["updated_at"]),
         )
 
-    def update(self, description: str = None, status: TaskStatus = None) -> None:
+    def update(
+        self, description: str | None = None, status: TaskStatus | None = None
+    ) -> None:
         """Update the task in memory"""
         if description is not None:
             self.description = description
