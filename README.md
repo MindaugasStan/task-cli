@@ -1,5 +1,7 @@
 # task-cli
 
+https://github.com/MindaugasStan/task-cli/
+
 A simple command-line task manager that lets you add, update, delete, and track the status of your tasks. Tasks are stored locally in a `tasks.json` file.
 
 ## Requirements
