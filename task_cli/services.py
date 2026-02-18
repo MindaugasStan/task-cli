@@ -43,6 +43,5 @@ def list_tasks(status: TaskStatus | None = None) -> list[dict]:
     tasks = load_tasks()
     if not status:
         return list(tasks)
-    normalized_status = status.replace("-", "_")
-    return list(filter(lambda task_dict: task_dict["status"] == normalized_status, tasks))
+    return list(filter(lambda task_dict: task_dict["status"] == status, tasks))
 

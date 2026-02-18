@@ -1,124 +1,55 @@
-import argparse
-import task_cli.cli as task_cli
+from types import SimpleNamespace
+
+import task_cli.cli as cli
+import task_cli.services as services
 
 
-def test_run_add(monkeypatch):
-    called = {}
-    def fake_handle(args):
-        called["task"] = args.task
-        return 0
+def test_add_task(monkeypatch, capsys):
+    monkeypatch.setattr(services, "add_task", lambda text: SimpleNamespace(id=42))
 
-    monkeypatch.setattr(task_cli, "handle_add", fake_handle)
-
-    result = task_cli.run(["add", "Buy milk"])
+    result = cli.run(["add", "Buy milk"])
 
     assert result == 0
-    assert called["task"] == "Buy milk"
+    assert "Task added successfully (ID: 42)" in capsys.readouterr().out
 
 
-# fake task object to return from add_task
-class FakeTask:
-    def __init__(self, task_id):
-        self.id = task_id
+def test_add_task_failure(monkeypatch):
+    monkeypatch.setattr(services, "add_task", lambda text: None)
 
-def test_handle_add_print(monkeypatch, capsys):
-    def fake_add_task(text):
-        return FakeTask(42)
-
-    monkeypatch.setattr(task_cli, "add_task", fake_add_task)
-
-    args = argparse.Namespace(task="Buy milk")
-    result = task_cli.handle_add(args)
-
-    captured = capsys.readouterr()
-
-    assert result == 0
-    assert "Task added successfully (ID: 42)" in captured.out
+    assert cli.run(["add", "Buy milk"]) == 1
 
 
-def test_handle_add_failure(monkeypatch, capsys):
-    monkeypatch.setattr(task_cli, "add_task", lambda x: None)
+def test_delete_task(monkeypatch):
+    monkeypatch.setattr(services, "delete_task", lambda task_id: None)
 
-    args = argparse.Namespace(task="Buy milk")
-    result = task_cli.handle_add(args)
+    assert cli.run(["delete", "1"]) == 0
 
-    captured = capsys.readouterr()
+
+def test_delete_task_not_found(monkeypatch, capsys):
+    monkeypatch.setattr(services, "delete_task", lambda task_id: (_ for _ in ()).throw(KeyError("Not found")))
+
+    result = cli.run(["delete", "999"])
 
     assert result == 1
-    assert captured.out == ""
+    assert "Not found" in capsys.readouterr().out
 
 
-def test_handle_delete_calls_delete_task(monkeypatch):
-    called = {}
+def test_mark_in_progress(monkeypatch):
+    monkeypatch.setattr(services, "mark_task_in_progress", lambda task_id: None)
 
-    def fake_delete_task(task_id):
-        called["id"] = task_id
-
-    monkeypatch.setattr(task_cli, "delete_task", fake_delete_task)
-
-    args = argparse.Namespace(task_id=5)
-    result = task_cli.handle_delete(args)
-
-    assert result == 0
-    assert called["id"] == 5
+    assert cli.run(["mark-in-progress", "1"]) == 0
 
 
-def test_handle_in_progress_success(monkeypatch):
-    def fake_mark(task_id):
-        pass
+def test_mark_done(monkeypatch):
+    monkeypatch.setattr(services, "mark_task_done", lambda task_id: None)
 
-    monkeypatch.setattr(task_cli, "mark_task_in_progress", fake_mark)
+    assert cli.run(["mark-done", "1"]) == 0
 
-    args = argparse.Namespace(task_id=2)
-    result = task_cli.handle_in_progress(args)
+
+def test_list_empty(monkeypatch, capsys):
+    monkeypatch.setattr(services, "list_tasks", lambda status: [])
+
+    result = cli.run(["list"])
 
     assert result == 0
-
-def test_handle_in_progress_failure(monkeypatch, capsys):
-    def fake_mark(task_id):
-        raise KeyError("Not found")
-
-    monkeypatch.setattr(task_cli, "mark_task_in_progress", fake_mark)
-
-    args = argparse.Namespace(task_id=2)
-    result = task_cli.handle_in_progress(args)
-
-    captured = capsys.readouterr()
-    assert result == 1
-    assert "Not found" in captured.out
-
-
-def test_handle_done_success(monkeypatch):
-    def fake_mark(task_id):
-        pass
-
-    monkeypatch.setattr(task_cli, "mark_task_done", fake_mark)
-
-    args = argparse.Namespace(task_id=3)
-    result = task_cli.handle_done(args)
-    assert result == 0
-
-def test_handle_done_failure(monkeypatch, capsys):
-    def fake_mark(task_id):
-        raise KeyError("Not found")
-
-    monkeypatch.setattr(task_cli, "mark_task_done", fake_mark)
-
-    args = argparse.Namespace(task_id=3)
-    result = task_cli.handle_done(args)
-
-    captured = capsys.readouterr()
-    assert result == 1
-    assert "Not found" in captured.out
-
-
-def test_handle_list_empty(monkeypatch, capsys):
-    monkeypatch.setattr(task_cli, "list_tasks", lambda status: [])
-
-    args = argparse.Namespace(status=None)
-    result = task_cli.handle_list(args)
-
-    captured = capsys.readouterr()
-    assert result == 0
-    assert "No tasks found" in captured.out
-
+    assert "No tasks found" in capsys.readouterr().out

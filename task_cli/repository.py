@@ -21,10 +21,10 @@ def _update_task(task_id: int, description: str = None, status: TaskStatus = Non
     raise KeyError(f"No such task with id {task_id}")
 
 
-def load_tasks() -> list[dict]:
+def load_tasks(task_file: Path = TASK_FILE) -> list[dict]:
     """Read tasks from the JSON file."""
-    if TASK_FILE.exists():
-        with open(TASK_FILE, "r", encoding="utf-8") as f:
+    if task_file.exists():
+        with open(task_file, "r", encoding="utf-8") as f:
             return json.load(f)
     return []
 

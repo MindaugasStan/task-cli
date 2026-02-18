@@ -1,7 +1,7 @@
 import argparse
 from typing import Sequence
 
-from task_cli.models import Task
+from task_cli.models import Task, TaskStatus
 from task_cli.services import add_task, update_task, delete_task, mark_task_in_progress, mark_task_done, list_tasks
 
 
@@ -34,7 +34,7 @@ def run(argv: Sequence | None = None) -> int:
     list_parser.add_argument(
         "status",
         nargs="?",
-        choices=["todo", "in-progress", "done"],
+        choices=[status.value for status in TaskStatus],
     )
     list_parser.set_defaults(func=handle_list)
 
@@ -45,10 +45,8 @@ def run(argv: Sequence | None = None) -> int:
 
 def handle_add(args: argparse.Namespace) -> int:
     task = add_task(args.task)
-    if task:
-        print(f"Task added successfully (ID: {task.id})")
-        return 0
-    return 1
+    print(f"Task added successfully (ID: {task.id})")
+    return 0
 
 
 def handle_update(args: argparse.Namespace) -> int:
@@ -70,22 +68,20 @@ def handle_delete(args: argparse.Namespace) -> int:
     return 0
 
 
-def handle_in_progress(args: argparse.Namespace) -> int:
+def _handle_mark(mark_func, task_id: int) -> int:
     try:
-        mark_task_in_progress(args.task_id)
+        mark_func(task_id)
         return 0
     except KeyError as error:
         print(error)
         return 1
+
+def handle_in_progress(args: argparse.Namespace) -> int:
+    return _handle_mark(mark_task_in_progress, args.task_id)
 
 
 def handle_done(args: argparse.Namespace) -> int:
-    try:
-        mark_task_done(args.task_id)
-        return 0
-    except KeyError as error:
-        print(error)
-        return 1
+    return _handle_mark(mark_task_done, args.task_id)
 
 
 def handle_list(args: argparse.Namespace) -> int:
